@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chikchak — Reservations Admin</title>
+
+  <!-- 
+    - custom css link
+  -->
+  <link rel="stylesheet" href="./assets/css/style.css">
+
+  <!-- 
+    - google font link
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Forum&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      background-color: #FAF3E0;
+      color: #2B1810;
+      margin: 0;
+      font-family: var(--fontFamily-dm_sans, sans-serif);
+    }
+    
+    .admin-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .admin-title {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .stats-container {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .stat-box {
+      background: #FFFFFF;
+      padding: 24px;
+      border: 1px solid #E5DCC3;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .stat-box h3 {
+      margin-bottom: 5px;
+      color: #2B1810;
+      font-family: var(--fontFamily-forum, serif);
+      font-size: 40px;
+      line-height: 1;
+    }
+
+    .stat-box p {
+      color: #3FA34D;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    
+    .controls input {
+      background: #FFFFFF;
+      border: 1px solid #E5DCC3;
+      color: #2B1810;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .controls .btn {
+      white-space: nowrap;
+      padding: 12px 24px;
+      font-size: 14px;
+      background-color: #3FA34D;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .date-group {
+      margin-top: 40px;
+      margin-bottom: 20px;
+      font-family: var(--fontFamily-forum, serif);
+      color: #2B1810;
+      border-bottom: 1px solid #E5DCC3;
+      padding-bottom: 10px;
+    }
+    
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+      font-size: 1.4rem;
+      background: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .admin-table th, .admin-table td {
+      border: 1px solid #E5DCC3;
+      padding: 12px;
+      text-align: left;
+    }
+    
+    .admin-table th {
+      background: #3FA34D;
+      color: #FFFFFF;
+      font-weight: bold;
+    }
+    
+    .admin-table tr:nth-child(even) {
+      background: #FAF3E0;
+    }
+
+    .admin-table tr:hover {
+      background: #f0e6cd;
+    }
+    
+    .pill {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .pill.pending { background: #F5C518; color: #2B1810; }
+    .pill.confirmed { background: #3FA34D; color: #FFFFFF; border: none; }
+    .pill.cancelled { background: #E0E0E0; color: #333333; }
+    
+    .actions {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .actions button {
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      border: none;
+      font-weight: bold;
+    }
+    
+    .actions button.btn-confirm { background: #3FA34D; color: white; }
+    .actions button.btn-cancel { background: #F5C518; color: #2B1810; }
+    .actions button.btn-delete { background: #EF4444; color: white; }
+
+    .actions button:hover {
+      opacity: 0.8;
+    }
+
+    .empty-state {
+      padding: 60px;
+      text-align: center;
+      color: rgba(43, 24, 16, 0.6);
+      font-style: italic;
+      font-size: 1.6rem;
+    }
+
+    @media (max-width: 768px) {
+      .admin-table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="admin-container">
+    <div class="admin-header">
+      <div class="admin-title">
+        <img src="./assets/images/logo.png" alt="Chikchak" width="60">
+        <h1 class="headline-1" style="color: #2B1810;">Chikchak Admin</h1>
+      </div>
+      <div class="stats-container">
+      <div class="stat-box">
+        <h3 class="title-3" id="stat-today">0</h3>
+        <p class="label-2">Today</p>
+      </div>
+      <div class="stat-box">
+        <h3 class="title-3" id="stat-week">0</h3>
+        <p class="label-2">This Week</p>
+      </div>
+      <div class="stat-box">
+        <h3 class="title-3" id="stat-pending">0</h3>
+        <p class="label-2">Pending</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label for="date-filter" class="label-2">Filter from:</label>
+    <input type="date" id="date-filter">
+    <button class="btn" onclick="loadData()">Refresh Now</button>
+  </div>
+
+  <div id="tables-container">
+    <!-- Tables will be injected here -->
+  </div>
+
+  <script>
+    let adminPass = sessionStorage.getItem('adminPass');
+    if (!adminPass) {
+      adminPass = window.prompt("Enter Admin Password:");
+      if (adminPass) {
+        sessionStorage.setItem('adminPass', adminPass);
+      } else {
+        document.body.innerHTML = '<h2>Unauthorized</h2>';
+      }
+    }
+
+    const todayDateStr = new Date().toISOString().split('T')[0];
+    document.getElementById('date-filter').value = todayDateStr;
+
+    async function apiRequest(url, method = 'GET', body = null) {
+      const headers = { 'x-admin-password': adminPass };
+      if (body) headers['Content-Type'] = 'application/json';
+      
+      const res = await fetch(url, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : null
+      });
+      
+      if (res.status === 401) {
+        alert("Invalid Password or session expired.");
+        sessionStorage.removeItem('adminPass');
+        window.location.reload();
+        throw new Error("Unauthorized");
+      }
+      return res.json();
+    }
+
+    async function loadData() {
+      try {
+        const data = await apiRequest('/api/reservations');
+        if (data.success) {
+          renderData(data.reservations);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderData(reservations) {
+      const filterDateStr = document.getElementById('date-filter').value;
+      const filtered = reservations.filter(r => r.date >= filterDateStr);
+      
+      // Calculate Stats (on all data or future? Let's do all upcoming/current)
+      let todayCount = 0;
+      let weekCount = 0;
+      let pendingCount = 0;
+      
+      const today = new Date(todayDateStr);
+      const nextWeek = new Date(today);
+      nextWeek.setDate(today.getDate() + 7);
+
+      reservations.forEach(r => {
+        if (r.date === todayDateStr) todayCount++;
+        const rDate = new Date(r.date);
+        if (rDate >= today && rDate <= nextWeek) weekCount++;
+        if (r.status === 'pending') pendingCount++;
+      });
+      
+      document.getElementById('stat-today').textContent = todayCount;
+      document.getElementById('stat-week').textContent = weekCount;
+      document.getElementById('stat-pending').textContent = pendingCount;
+
+      // Group by date
+      const grouped = {};
+      filtered.forEach(r => {
+        if (!grouped[r.date]) grouped[r.date] = [];
+        grouped[r.date].push(r);
+      });
+      
+      // Sort dates
+      const sortedDates = Object.keys(grouped).sort();
+      
+      let html = '';
+      sortedDates.forEach(date => {
+        const dateObj = new Date(date);
+        const displayDate = dateObj.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        html += `<h2 class="title-2 date-group">${displayDate}</h2>`;
+        html += `
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Party</th>
+                <th>Message</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+        
+        // Sort by time within the day
+        const dayRes = grouped[date].sort((a,b) => a.time.localeCompare(b.time));
+        
+        dayRes.forEach(r => {
+          html += `
+            <tr>
+              <td>${r.time}</td>
+              <td>${r.name}</td>
+              <td><a href="tel:${r.phone}" style="color: var(--gold-crayola)">${r.phone}</a></td>
+              <td>${r.people}</td>
+              <td>${r.message || '-'}</td>
+              <td><span class="pill ${r.status}">${r.status}</span></td>
+              <td class="actions">
+                <button class="btn-confirm" onclick="updateStatus('${r._id}', 'confirmed')">Confirm</button>
+                <button class="btn-cancel" onclick="updateStatus('${r._id}', 'cancelled')">Cancel</button>
+                <button class="btn-delete" onclick="deleteRes('${r._id}')">Delete</button>
+              </td>
+            </tr>
+          `;
+        });
+        
+        html += `</tbody></table>`;
+      });
+      
+      if (filtered.length === 0) {
+        html = '<div class="empty-state">No bookings yet. New reservations will appear here automatically.</div>';
+      }
+      
+      document.getElementById('tables-container').innerHTML = html;
+    }
+
+    async function updateStatus(id, status) {
+      try {
+        const res = await apiRequest(`/api/reservations/${id}/status`, 'PATCH', { status });
+        if (res.success) loadData();
+      } catch (err) {
+         console.error(err);
+      }
+    }
+
+    async function deleteRes(id) {
+      if (window.confirm("Are you sure you want to delete this reservation?")) {
+        try {
+          const res = await apiRequest(`/api/reservations/${id}`, 'DELETE');
+          if (res.success) loadData();
+        } catch (err) {
+           console.error(err);
+        }
+      }
+    }
+
+    // Initial load and interval
+    if (adminPass) {
+      loadData();
+      setInterval(loadData, 30000); // 30 seconds
+    }
+  </script>
+  </div>
+</body>
+</html>
