@@ -1,0 +1,21 @@
+[build]
+  publish = "public"
+  command = "echo 'Static frontend only — backend lives on Render'"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://chikchak.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/admin.html"
+  to = "https://chikchak.onrender.com/admin.html"
+  status = 302
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

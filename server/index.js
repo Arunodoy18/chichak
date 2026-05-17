@@ -25,10 +25,24 @@ app.get("/api/health", (req, res) => {
 const reservationsRouter = require("./routes/reservations");
 app.use("/api/reservations", reservationsRouter);
 
+// API 404 handler (prevents returning index.html for dead API endpoints)
+app.use('/api', (req, res) => {
+  res.status(404).json({ success: false, error: 'API endpoint not found' });
+});
+
+// Catch-all route for SPA navigation (must be AFTER API routes)
+app.get(/^.*$/, (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+});
+
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ success: false, error: "Server Error" });
+  if (process.env.NODE_ENV === 'production') {
+    res.status(500).json({ success: false, error: "Internal server error" });
+  } else {
+    res.status(500).json({ success: false, error: err.message || "Server Error" });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
